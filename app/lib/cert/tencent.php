@@ -11,7 +11,7 @@ class tencent implements CertInterface
     private $SecretId;
     private $SecretKey;
     private $email;
-    private $endpoint = "ssl.tencentcloudapi.com";
+    private $endpoint = "ssl.ipv6.tencentcloudapi.com";
     private $service = "ssl";
     private $version = "2019-12-05";
     private $logger;
@@ -41,7 +41,8 @@ class tencent implements CertInterface
         if (empty($domainList)) throw new Exception('域名列表不能为空');
         $domain = $domainList[0];
         $param = [
-            'DvAuthMethod' => 'DNS',
+            'DvAuthMethod' => 'DNS_AUTO',
+            'DeleteDnsAutoRecord' => true,
             'DomainName' => $domain,
             'ContactEmail' => $this->email,
             'CsrEncryptAlgo' => $keytype,
@@ -58,13 +59,13 @@ class tencent implements CertInterface
         $order['OrderId'] = $data['OrderId'];
 
         $dnsList = [];
-        if (!empty($data['DvAuthDetail']['DvAuths'])) {
-            foreach ($data['DvAuthDetail']['DvAuths'] as $opts) {
-                $mainDomain = getMainDomain($opts['DvAuthKey']);
-                $name = substr($opts['DvAuthKey'], 0, -(strlen($mainDomain) + 1));
-                $dnsList[$mainDomain][] = ['name' => $name, 'type' => $opts['DvAuthVerifyType'] ?? 'CNAME', 'value' => $opts['DvAuthValue']];
-            }
-        }
+        // if (!empty($data['DvAuthDetail']['DvAuths'])) {
+        //     foreach ($data['DvAuthDetail']['DvAuths'] as $opts) {
+        //         $mainDomain = getMainDomain($opts['DvAuthKey']);
+        //         $name = substr($opts['DvAuthKey'], 0, -(strlen($mainDomain) + 1));
+        //         $dnsList[$mainDomain][] = ['name' => $name, 'type' => $opts['DvAuthVerifyType'] ?? 'CNAME', 'value' => $opts['DvAuthValue']];
+        //     }
+        // }
 
         return $dnsList;
     }
@@ -110,7 +111,7 @@ class tencent implements CertInterface
             'ServiceType' => 'nginx',
         ];
         $data = $this->request('DescribeDownloadCertificateUrl', $param);
-        $file_data = http_request($data['DownloadCertificateUrl'], null, null, null, null, $this->proxy);
+        $file_data = http_request(str_replace('https://certificate-1258344699.cos.ap-guangzhou.myqcloud.com/', 'https://txssl.bestzyq.cn/', $data['DownloadCertificateUrl']), null, null, null, null, $this->proxy);
         $file_data = $file_data['body'] ?? null;
         if (empty($file_data)) throw new Exception('下载证书失败');
         $file_path = app()->getRuntimePath() . 'cert/' . $data['DownloadFilename'];

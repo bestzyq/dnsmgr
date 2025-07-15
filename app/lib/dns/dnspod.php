@@ -10,7 +10,7 @@ class dnspod implements DnsInterface
 {
     private $SecretId;
     private $SecretKey;
-    private $endpoint = "dnspod.tencentcloudapi.com";
+    private $endpoint = "dnspod.ipv6.tencentcloudapi.com";
     private $service = "dnspod";
     private $version = "2021-03-23";
     private $error;
