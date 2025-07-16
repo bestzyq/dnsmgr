@@ -25,7 +25,7 @@ class aliyun implements DeployInterface
     public function check()
     {
         if (empty($this->AccessKeyId) || empty($this->AccessKeySecret)) throw new Exception('必填参数不能为空');
-        $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, 'cas.aliyuncs.com', '2020-04-07', $this->proxy);
+        $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, 'cas.aliyuncs.com.bestzyq.cn', '2020-04-07', $this->proxy);
         $param = ['Action' => 'ListUserCertificateOrder'];
         $client->request($param);
         return true;
@@ -84,7 +84,7 @@ class aliyun implements DeployInterface
         if ($config['region'] == 'ap-southeast-1') {
             $endpoint = 'cas.ap-southeast-1.aliyuncs.com';
         } else {
-            $endpoint = 'cas.aliyuncs.com';
+            $endpoint = 'cas.aliyuncs.com.bestzyq.cn';
         }
 
         $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, $endpoint, '2020-04-07', $this->proxy);
@@ -101,7 +101,7 @@ class aliyun implements DeployInterface
         $cert_id = null;
         if ($data['TotalCount'] > 0 && !empty($data['CertificateOrderList'])) {
             foreach ($data['CertificateOrderList'] as $cert) {
-                if (strtolower($cert['SerialNo']) == $serial_no || strpos(strtolower($cert['SerialNo']), $serial_no) !== false) {
+                if (str_contains(strtolower($cert['SerialNo']), $serial_no)) {
                     $cert_id = $cert['CertificateId'];
                     $cert_name = $cert['Name'];
                     break;
@@ -133,7 +133,7 @@ class aliyun implements DeployInterface
     {
         $domain = $config['domain'];
         if (empty($domain)) throw new Exception('CDN绑定域名不能为空');
-        $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, 'cdn.aliyuncs.com', '2018-05-10', $this->proxy);
+        $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, 'cdn.aliyuncs.com.bestzyq.cn', '2018-05-10', $this->proxy);
         $param = [
             'Action' => 'SetCdnDomainSSLCertificate',
             'DomainName' => $domain,
@@ -150,7 +150,7 @@ class aliyun implements DeployInterface
     {
         $domain = $config['domain'];
         if (empty($domain)) throw new Exception('DCDN绑定域名不能为空');
-        $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, 'dcdn.aliyuncs.com', '2018-01-15', $this->proxy);
+        $client = new AliyunClient($this->AccessKeyId, $this->AccessKeySecret, 'dcdn.aliyuncs.com.bestzyq.cn', '2018-01-15', $this->proxy);
         $param = [
             'Action' => 'SetDcdnDomainSSLCertificate',
             'DomainName' => $domain,
